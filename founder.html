@@ -657,6 +657,51 @@ header{position:static}
 html{scroll-padding-top:20px}
 }
 @media(max-width:900px){.footer{flex-wrap:wrap;row-gap:14px}.footlinks{flex-wrap:wrap;gap:10px 20px}.copyright{margin-left:auto}}
+
+/* ===== хиро на телефоне: всё помещается на первый экран ===== */
+@keyframes spinc{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+@media(max-width:620px){
+.hero{min-height:calc(100vh - 62px - 62px - env(safe-area-inset-bottom));min-height:calc(100svh - 62px - 62px - env(safe-area-inset-bottom));display:flex}
+.hero-grid{display:flex;flex-direction:column;min-height:0;gap:0}
+.hero-copy{padding:26px 0 8px;flex:none}
+.eyebrow{margin-bottom:14px}
+.hero h1{font-size:clamp(28px,9.2vw,38px);margin-bottom:12px}
+.lead{font-size:14.5px;line-height:1.5}
+.actions{margin-top:18px;gap:10px;flex-wrap:nowrap}
+.actions .btn{width:auto;flex:1 1 0;min-width:0;padding:15px 10px;font-size:13px;white-space:normal;text-align:center;line-height:1.25}
+.art{flex:1 1 auto;min-height:230px;margin:0 -16px}
+.burst{left:50%;right:auto;top:56%;margin:0;height:min(86%,300px);width:auto;aspect-ratio:1;animation-name:spinc}
+.statue{left:50%;right:auto;margin:0;bottom:0;height:100%;transform:translateX(-46%)}
+}
+@media(max-width:620px) and (max-height:700px){
+.hero-copy{padding-top:18px}
+.hero h1{font-size:clamp(26px,8.4vw,34px)}
+.lead{font-size:14px}
+.art{min-height:200px}
+}
+@media(max-width:620px) and (min-height:800px){
+.hero-copy{padding-top:40px}
+.actions{flex-direction:column}
+.actions .btn{width:100%;flex:none;padding:17px}
+}
+
+/* хиро: доводка */
+@media(max-width:620px){
+.hero>.wrap{margin:0 auto;align-self:stretch}
+.actions,.actions .btn{}
+.actions{flex-direction:column;flex-wrap:nowrap;gap:9px}
+.actions .btn{width:100%;flex:none;padding:14px 18px;font-size:14px;white-space:nowrap}
+.art{min-height:210px}
+}
+@media(max-width:620px) and (max-height:700px){
+.actions .btn{padding:12px 18px;font-size:13.5px}
+.art{min-height:190px}
+}
+@media(max-width:620px) and (min-height:800px){
+.actions .btn{padding:17px}
+}
+/* хиро: ширина кнопок */
+@media(max-width:620px){.actions{align-self:stretch;width:100%}}
 /* очень широкие экраны: контент не расползается, герой не вытягивается */
 @media(min-width:1700px){.hero-grid{min-height:620px}}
 /* сенсорные устройства: без «залипающих» hover-эффектов */
