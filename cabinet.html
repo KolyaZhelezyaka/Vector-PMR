@@ -702,6 +702,66 @@ html{scroll-padding-top:20px}
 }
 /* хиро: ширина кнопок */
 @media(max-width:620px){.actions{align-self:stretch;width:100%}}
+
+/* ===== плашки в заголовках: ровные отступы ===== */
+h1 span{padding:.09em .22em .11em .22em;padding-right:calc(.22em + .015em);margin:.04em 0 .1em}
+@supports (text-box:trim-both cap alphabetic){
+h1 span{text-box:trim-both cap alphabetic;padding:.25em .22em;padding-right:calc(.22em + .015em);margin:.02em 0 .08em}
+}
+
+/* ===== синий блок «Готов начать»: звезда строго за кнопкой ===== */
+.cta{padding:66px 0}
+.cta:before{display:none}
+.cta-act{position:relative;isolation:isolate;padding:0 8px}
+.cta-act:before{content:'';position:absolute;z-index:-1;left:50%;top:50%;width:230px;height:230px;transform:translate(-50%,-50%);background:rgba(255,255,255,.1);clip-path:polygon(50.0% 0.0%,59.3% 15.2%,75.0% 6.7%,75.5% 24.5%,93.3% 25.0%,84.8% 40.7%,100.0% 50.0%,84.8% 59.3%,93.3% 75.0%,75.5% 75.5%,75.0% 93.3%,59.3% 84.8%,50.0% 100.0%,40.7% 84.8%,25.0% 93.3%,24.5% 75.5%,6.7% 75.0%,15.2% 59.3%,0.0% 50.0%,15.2% 40.7%,6.7% 25.0%,24.5% 24.5%,25.0% 6.7%,40.7% 15.2%)}
+@media(max-width:760px){.cta{padding:54px 0}.cta-act:before{width:210px;height:210px}}
+
+/* ===== хиро на телефоне: слева текст и кнопки, справа фигура ===== */
+@media(max-width:620px){
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);grid-template-rows:auto 1fr auto;column-gap:0;align-items:stretch}
+.hero-copy{display:contents}
+.hero h1{grid-column:1/-1;grid-row:1;margin:24px 0 12px}
+.hero .lead{grid-column:1;grid-row:2;align-self:start;padding-right:14px;font-size:14px;line-height:1.5;position:relative;z-index:2}
+.hero .actions{grid-column:1;grid-row:3;align-self:end;margin:0;padding:14px 12px 22px 0;flex-direction:column;gap:9px;position:relative;z-index:2;width:auto}
+.hero .actions .btn{width:100%;padding:13px 12px;font-size:13px;line-height:1.25;white-space:normal;text-align:center}
+.hero .art{grid-column:2;grid-row:2/4;min-height:0;margin:0 -16px 0 0;position:relative}
+.hero .burst{left:42%;top:58%;height:auto;width:min(92%,240px);aspect-ratio:1;margin:0}
+.hero .statue{left:auto;right:-14%;bottom:0;height:min(100%,330px);width:auto;transform:none;max-width:none}
+}
+@media(max-width:620px) and (max-height:700px){
+.hero h1{margin-top:16px;font-size:clamp(25px,8vw,32px)}
+.hero .lead{font-size:13.5px}
+.hero .actions .btn{padding:11px 10px;font-size:12.5px}
+}
+
+/* хиро (моб.): фигура строго в правой колонке */
+@media(max-width:620px){
+.hero-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.hero .art{margin-right:-16px}
+.hero .burst{left:50%;top:60%;width:96%;height:auto}
+.hero .statue{left:auto;right:-4%;bottom:0;width:100%;height:auto;max-height:100%;transform:none;max-width:none;object-fit:contain;object-position:bottom right}
+.hero .actions{padding-right:10px}
+}
+
+/* хиро (моб.): звезда привязана к фигуре */
+@keyframes spinb{from{transform:translateX(-50%) rotate(0)}to{transform:translateX(-50%) rotate(360deg)}}
+@media(max-width:620px){
+.hero-grid{grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr)}
+.hero .art{container-type:inline-size}
+.hero .burst{left:50%;top:auto;bottom:16cqw;width:100cqw;height:100cqw;aspect-ratio:auto;margin:0;animation-name:spinb}
+.hero .statue{right:-10%;width:110%}
+}
+
+/* мелкие доводки */
+@media(max-width:760px){
+.cta .wrap{gap:62px}
+.cta-act{align-self:center}
+.cta-act:before{width:200px;height:200px}
+}
+@media(max-width:620px){
+.page-hero:after{width:170px;height:170px;right:-84px;top:-76px}
+}
+.t-sync{display:flex;align-items:center;gap:12px;margin:0 0 14px;flex-wrap:wrap}.t-sync span{font-size:12px;font-weight:700;color:var(--mut)}
 /* очень широкие экраны: контент не расползается, герой не вытягивается */
 @media(min-width:1700px){.hero-grid{min-height:620px}}
 /* сенсорные устройства: без «залипающих» hover-эффектов */
@@ -712,9 +772,9 @@ html{scroll-padding-top:20px}
   <form class="gate-box" id="gateForm">
     <img src="data:image/png;base64,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" alt="VECTOR" width="64" height="64">
     <h1>Кабинет преподавателя</h1>
-    <p id="gateText">Введи пароль, который тебе дал основатель.</p>
+    <p id="gateText">Введи код доступа, который тебе выдал основатель.</p>
     <select id="gateName" hidden></select>
-    <input type="password" id="gatePass" placeholder="Пароль" autocomplete="current-password" required>
+    <input type="password" id="gatePass" placeholder="Код доступа" autocomplete="current-password" required>
     <button class="btn" type="submit" id="gateBtn">Войти&nbsp; ➜</button>
     <p class="gate-err" id="gateErr"></p>
   </form>
@@ -730,6 +790,7 @@ html{scroll-padding-top:20px}
     <button class="btn big" id="addBtn" type="button">+ Занятие</button>
   </div>
 
+  <div class="t-sync"><button class="btn outline sm" id="syncBtn" type="button">Обновить</button><button class="btn outline sm" id="codeBtn" type="button" hidden>Сменить код</button><span id="syncAt"></span></div>
   <div class="t-sum" id="sum"></div>
 
   <div class="t-tabs" role="tablist">
@@ -763,6 +824,16 @@ html{scroll-padding-top:20px}
   </section>
 </main>
 
+<dialog id="codeDlg" class="dlg">
+  <form id="codeForm" method="dialog" class="dlg-form">
+    <h2>Сменить код доступа</h2>
+    <p class="note" style="text-align:left;margin:0 0 6px">Придумай свой код: от 8 символов, лучше буквы и цифры вместе. Он нужен только для входа сюда. Старый код перестанет работать.</p>
+    <div class="field"><label for="newCode">Новый код</label><input id="newCode" type="password" autocomplete="new-password" minlength="8" maxlength="40" required></div>
+    <div class="field"><label for="newCode2">Повтори код</label><input id="newCode2" type="password" autocomplete="new-password" minlength="8" maxlength="40" required></div>
+    <p class="gate-err" id="codeErr" style="color:#d4142e;font-weight:700;min-height:1em;margin:0"></p>
+    <div class="dlg-btns"><button class="btn outline" id="codeCancel" type="button">Отмена</button><button class="btn" id="codeSave" type="submit">Сохранить</button></div>
+  </form>
+</dialog>
 <dialog id="dlg" class="dlg">
   <form id="lf" method="dialog" class="dlg-form">
     <h2 id="dlgTitle">Новое занятие</h2>
@@ -806,7 +877,7 @@ html{scroll-padding-top:20px}
 
 // Адрес приёма заявок (веб-приложение Google Apps Script из файла lead-backend.gs).
 // Пока пусто — форма работает «по-старому»: копирует текст заявки и открывает Instagram.
-const LEAD_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzglWXiK8ZGoD4UCfv0yyRUwUv-l4p6IVW9G0yFggR7IqRDtGp6VPWUO2_lbA50n_EatQ/exec';
+const LEAD_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyWRNRLP-ksQehZTHJuZACTFzVcOrNG86TgpkrWcdW-zAUeGaYDZwIQ7IKnHfy1joSIrw/exec';
 
 // Преподаватели (имена должны совпадать с lead-backend.gs). Появляются в форме записи и в кабинете.
 const TEACHERS = ['Артём'];
@@ -880,6 +951,37 @@ if (form) {
   }
   if (p.get('teacher') && sel && TEACHERS.indexOf(p.get('teacher')) >= 0) sel.value = p.get('teacher');
 
+  // список преподавателей берём с сервера (его ведёт основатель); если сервер недоступен, остаётся список из этого файла
+  function refreshTeachers() {
+    if (!sel) return;
+    const want = sel.value || p.get('teacher') || '';
+    sel.innerHTML = '<option value="">Любой преподаватель</option>' +
+      TEACHERS.map(t => '<option value="' + t + '">' + t + '</option>').join('');
+    const fld = sel.closest('.field');
+    if (TEACHERS.length < 2) { sel.value = TEACHERS[0] || ''; if (fld) fld.hidden = true; }
+    else { if (fld) fld.hidden = false; if (TEACHERS.indexOf(want) >= 0) sel.value = want; }
+  }
+  if (LEAD_ENDPOINT && sel) {
+    fetch(LEAD_ENDPOINT + '?action=teachers&_=' + Date.now(), { cache: 'no-store' }).then(r => r.json()).then(d => {
+      if (d && d.ok && Array.isArray(d.teachers) && d.teachers.length) {
+        TEACHERS.length = 0; d.teachers.forEach(t => TEACHERS.push(String(t))); refreshTeachers();
+      }
+    }).catch(() => {});
+  }
+
+  // одноразовый токен отправки: защита от ботов, которые шлют заявки вслепую
+  let tokenP = null, tokenAt = 0;
+  function getToken() {
+    if (!LEAD_ENDPOINT) return Promise.resolve(null);
+    if (!tokenP) {
+      tokenAt = Date.now();
+      tokenP = fetch(LEAD_ENDPOINT + '?action=token&_=' + Date.now(), { cache: 'no-store' })
+        .then(r => r.json()).then(d => (d && d.ok ? d.token : null)).catch(() => null);
+    }
+    return tokenP;
+  }
+  form.addEventListener('focusin', getToken, { once: true });
+
   const btn = form.querySelector('button[type=submit]');
   const note = document.getElementById('formNote');
   const ok = document.getElementById('ok');
@@ -950,12 +1052,17 @@ if (form) {
     if (ok) ok.classList.remove('show');
     try {
       if (LEAD_ENDPOINT) {
-        // text/plain + no-cors: так запрос уходит без предварительной проверки CORS
-        await fetch(LEAD_ENDPOINT, {
-          method: 'POST',
-          mode: 'no-cors',
-          body: JSON.stringify(Object.assign({ action: 'lead', page: location.pathname.split('/').pop() }, f))
-        });
+        const token = await getToken();
+        tokenP = null; // токен одноразовый
+        if (!token) throw new Error('token');
+        const wait = 2300 - (Date.now() - tokenAt); // сервер отсекает отправку быстрее 2 секунд после открытия формы
+        if (wait > 0) await new Promise(r => setTimeout(r, wait));
+        const body = Object.assign({ action: 'lead', token: token, page: location.pathname.split('/').pop() }, f);
+        let url = LEAD_ENDPOINT + '?action=do&payload=' + encodeURIComponent(JSON.stringify(body));
+        if (url.length > 6500) { body.comment = String(body.comment || '').slice(0, 120); url = LEAD_ENDPOINT + '?action=do&payload=' + encodeURIComponent(JSON.stringify(body)); }
+        // читаем настоящий ответ сервера: так видно и отказ (слишком много заявок, плохие данные)
+        const out = await fetch(url, { cache: 'no-store' }).then(r => r.json());
+        if (!out || !out.ok) throw new Error((out && out.error) || 'fail');
       } else {
         // запасной вариант: письмо на LEAD_EMAIL через FormSubmit
         const res = await fetch('https://formsubmit.co/ajax/' + encodeURIComponent(LEAD_EMAIL), {
@@ -979,7 +1086,11 @@ if (form) {
       if (sel) sel.value = TEACHERS.length < 2 ? (TEACHERS[0] || '') : '';
       btn.textContent = 'Отправлено ✓';
     } catch (err) {
-      showMsg('Не получилось отправить заявку. Проверьте интернет или напишите нам в Instagram.', true);
+      const code = String(err && err.message);
+      showMsg(code === 'busy'
+        ? 'Сейчас приходит очень много заявок. Попробуйте через несколько минут или напишите нам в Instagram.'
+        : (code === 'bad' ? 'Проверьте имя и контакт: без ссылок и лишних символов.'
+        : 'Не получилось отправить заявку. Проверьте интернет или напишите нам в Instagram.'), true);
       btn.textContent = 'Не отправилось';
     }
     setTimeout(() => {
@@ -998,7 +1109,7 @@ if (form) {
   var PRICES={'Индивидуально':100,'В паре':70,'Мини-группа':50};
   var MON=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
   var WD=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
-  var S={lessons:[],students:[],percent:0,balance:null,leads:[],showAllLeads:false,lastNew:null,month:null,name:'',key:''};
+  var S={lessons:[],students:[],percent:0,balance:null,leads:[],showAllLeads:false,lastNew:null,month:null,name:'',key:'',seq:0,pend:0,base:null,syncAt:null};
   S.week='';S.month=new Date().getFullYear()+'-'+('0'+(new Date().getMonth()+1)).slice(-2);
 
   function mondayOf(s){var d=pd(s),k=(d.getDay()+6)%7;d.setDate(d.getDate()-k);return iso(d)}
@@ -1056,12 +1167,13 @@ if (form) {
   /*CLEND*/
 
   /* ---------- сервер ---------- */
-  function api(q){return fetch(LEAD_ENDPOINT+'?'+q).then(function(r){return r.json()})}
+  function api(q){return fetch(LEAD_ENDPOINT+'?'+q+'&_='+Date.now(),{cache:'no-store'}).then(function(r){return r.json()})}
   // запись идёт через GET: так сайт получает настоящий ответ сервера и видит ошибку
   function call(body){
+    S.pend++;
     return api('action=do&payload='+encodeURIComponent(JSON.stringify(Object.assign({key:S.key},body)))).then(function(d){
-      if(!d||!d.ok)throw new Error((d&&d.error)||'fail');return d;
-    });
+      S.pend--;if(!d||!d.ok)throw new Error((d&&d.error)||'fail');return d;
+    },function(e){S.pend--;throw e});
   }
   function fail(err){
     var m=String(err&&err.message||'');
@@ -1069,42 +1181,82 @@ if (form) {
     loadLessons().catch(function(){});
   }
 
+  function earnedOf(L,pc){return L.filter(function(l){return l.done==='1'&&l.paid==='1'}).reduce(function(s,l){return s+(+l.amount||0)},0)*(100-pc)/100}
+  // «К выплате» считаем на странице по списку занятий, чтобы число менялось сразу при отметке «Оплачено».
+  // Уже выплаченное берём из ответа сервера: выплачено = заработано(на момент загрузки) − к выплате(сервер).
+  function owedNow(){
+    if(!S.base)return S.balance?(+S.balance.owed||0):0;
+    var out=S.base.earned-S.base.owed;
+    return Math.round((earnedOf(S.lessons,S.percent)-out)*100)/100;
+  }
+  function stamp(){var d=new Date();S.syncAt=d;var el=$('syncAt');if(el)el.textContent='обновлено '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)}
   function loadLessons(){
+    var seq=++S.seq;
     return api('action=lessons&key='+encodeURIComponent(S.key)+'&teacher='+encodeURIComponent(S.name)).then(function(d){
       if(!d||!d.ok)throw new Error(d&&d.error||'fail');
       if(!d.version||d.version<3||!Array.isArray(d.lessons))throw new Error('old');
+      // устаревший ответ (пришёл позже более нового) или идёт сохранение — не затираем свежие правки
+      if(seq!==S.seq||S.pend>0)return d;
       S.lessons=d.lessons||[];S.students=d.students||[];S.percent=+d.percent||0;S.balance=d.balance;
-      render();return d;
+      var ow=S.balance&&isFinite(+S.balance.owed)?+S.balance.owed:null;
+      S.base=ow===null?null:{earned:earnedOf(S.lessons,S.percent),owed:ow};
+      stamp();render();return d;
     });
   }
 
-  /* ---------- вход ---------- */
-  var T=(typeof TEACHERS!=='undefined'&&TEACHERS.length)?TEACHERS:[];
-  if(T.length>1){$('gateName').hidden=false;$('gateName').innerHTML=T.map(function(t){return '<option>'+esc(t)+'</option>'}).join('');var sv=store.get(NAME);if(T.indexOf(sv)>=0)$('gateName').value=sv}
+  /* ---------- вход по личному коду ---------- */
   if(typeof LEAD_ENDPOINT==='undefined'||!LEAD_ENDPOINT){
     $('gateText').textContent='Кабинет заработает после подключения (инструкция в файле ПОДКЛЮЧЕНИЕ-ЗАЯВОК.md, вариант Б).';
     $('gatePass').hidden=true;$('gateBtn').hidden=true;
   }
+  function doLogin(code){
+    return api('action=login&code='+encodeURIComponent(code)).then(function(d){
+      if(!d||!d.ok)throw new Error(d&&d.error||'fail');
+      if(!d.name)throw new Error('old');
+      return d;
+    });
+  }
   function enter(name,key){
     S.name=name;S.key=key;store.set(KEY,key);store.set(NAME,name);
-    $('gate').hidden=true;$('app').hidden=false;$('lockBtn').hidden=false;
+    $('gate').hidden=true;$('app').hidden=false;$('lockBtn').hidden=false;$('codeBtn').hidden=false;
     $('hello').textContent='Привет, '+name;
-    loadLessons().catch(function(err){$('msg').textContent=String(err.message)==='old'?'Скрипт на Google устарел: обновите развёртывание (Версия: Новая), иначе отметки не сохраняются.':'Не удалось загрузить занятия. Проверьте интернет.'});
+    loadLessons().catch(function(err){$('msg').textContent=String(err.message)==='old'?'Скрипт на Google устарел: обновите развёртывание (Версия: Новая), иначе отметки не сохраняются.':'Не удалось загрузить занятия. Проверьте интернет и нажмите «Обновить».'});
     loadLeads(true);
   }
+  function loginErr(err){
+    var m=String(err&&err.message);
+    return m==='forbidden'?'Неверный код.':(m==='locked'?'Слишком много неверных попыток. Подожди 10 минут и попробуй снова.':(m==='old'?'Скрипт на Google устарел. Откройте Развернуть → Управление развёртываниями → карандаш → Версия: Новая → Развернуть.':'Не получилось войти. Проверь интернет и попробуй ещё раз.'));
+  }
   $('gateForm').addEventListener('submit',function(e){
-    e.preventDefault();var name=T.length>1?$('gateName').value:(T[0]||''),key=$('gatePass').value.trim();
+    e.preventDefault();var key=$('gatePass').value.trim();
     $('gateErr').textContent='';$('gateBtn').disabled=true;
-    S.name=name;S.key=key;
-    loadLessons().then(function(){enter(name,key)}).catch(function(err){
-      var m=String(err.message);$('gateErr').textContent=m==='forbidden'?'Неверный пароль.':(m==='old'?'Скрипт на Google устарел. Откройте Развернуть → Управление развёртываниями → карандаш → Версия: Новая → Развернуть.':'Не получилось войти. Проверьте интернет.');
+    doLogin(key).then(function(d){S.name=d.name;S.key=key;return loadLessons().then(function(){enter(d.name,key)})}).catch(function(err){
+      $('gateErr').textContent=loginErr(err);
     }).then(function(){$('gateBtn').disabled=false});
   });
-  $('lockBtn').addEventListener('click',function(){store.del(KEY);location.reload()});
+  $('lockBtn').addEventListener('click',function(){store.del(KEY);store.del(NAME);location.reload()});
   (function auto(){
-    var k=store.get(KEY),n=T.length>1?store.get(NAME):T[0];
-    if(k&&n&&typeof LEAD_ENDPOINT!=='undefined'&&LEAD_ENDPOINT){S.name=n;S.key=k;loadLessons().then(function(){enter(n,k)}).catch(function(){})}
+    var k=store.get(KEY);
+    if(!k||typeof LEAD_ENDPOINT==='undefined'||!LEAD_ENDPOINT)return;
+    doLogin(k).then(function(d){S.name=d.name;S.key=k;return loadLessons().then(function(){enter(d.name,k)})}).catch(function(err){
+      if(String(err&&err.message)==='forbidden'){store.del(KEY);store.del(NAME);$('gateErr').textContent='Код больше не подходит. Введи новый.'}
+    });
   })();
+
+  /* ---------- смена кода ---------- */
+  $('codeBtn').addEventListener('click',function(){$('codeForm').reset();$('codeErr').textContent='';$('codeDlg').showModal()});
+  $('codeCancel').addEventListener('click',function(){$('codeDlg').close()});
+  $('codeForm').addEventListener('submit',function(e){
+    e.preventDefault();var a=$('newCode').value.trim(),b=$('newCode2').value.trim(),btn=$('codeSave');
+    if(a!==b){$('codeErr').textContent='Коды не совпадают.';return}
+    btn.disabled=true;$('codeErr').textContent='';
+    call({action:'codeChange',newCode:a}).then(function(){
+      S.key=a;store.set(KEY,a);$('codeDlg').close();toast('Код изменён. Теперь входи с новым');
+    }).catch(function(err){
+      var m=String(err&&err.message);
+      $('codeErr').textContent=m==='weak'?'Код должен быть от 8 символов и не из одинаковых символов.':(m==='taken'?'Такой код занят. Придумай другой.':(m==='unknown_action'?'Скрипт на Google устарел: обновите развёртывание.':'Не получилось сменить код. Попробуй ещё раз.'));
+    }).then(function(){btn.disabled=false});
+  });
 
   /* ---------- отрисовка занятий ---------- */
   function sortKey(l){return l.date+' '+(l.time||'99:99')}
@@ -1139,7 +1291,7 @@ if (form) {
     $('mName').textContent=MON[+S.month.slice(5)-1]+' '+S.month.slice(0,4);
     $('done').innerHTML=moPaid.length?'<h3 class="t-h">Оплачено в этом месяце <span>'+moPaid.length+'</span></h3>'+moPaid.sort(function(a,b){return sortKey(a)<sortKey(b)?1:-1}).map(function(l){return card(l,'paid')}).join(''):'<div class="t-empty small"><span>В этом месяце оплаченных занятий пока нет.</span></div>';
 
-    var owed=S.balance?S.balance.owed:0,waitSum=waitPay.reduce(function(s,l){return s+(+l.amount||0)},0);
+    var owed=owedNow(),waitSum=waitPay.reduce(function(s,l){return s+(+l.amount||0)},0);
     $('sum').innerHTML=
       '<div class="t-s"><span>Проведено за месяц</span><strong>'+mo.length+'</strong></div>'+
       '<div class="t-s"><span>Ждём оплату от учеников</span><strong>'+fm(waitSum)+'</strong></div>'+
@@ -1306,7 +1458,17 @@ if (form) {
     else if(b.dataset.l==='plan'){S.pendingLead=l.id;openForm(null,{student:l.name,note:[l.grade,l.goal].filter(Boolean).join(', ')});S.pendingLead=l.id}
   });
   $('leadAll').addEventListener('click',function(){S.showAllLeads=!S.showAllLeads;renderLeads()});
-  setInterval(function(){if(!document.hidden&&!$('app').hidden){loadLeads(true);loadLessons().catch(function(){})}},60000);
+  function refreshAll(manual){
+    if($('app').hidden||S.pend>0)return;
+    var b=$('syncBtn');if(manual){b.disabled=true;b.textContent='Обновляем…'}
+    loadLeads(true);
+    loadLessons().then(function(){if(manual)toast('Обновлено')}).catch(function(){if(manual)toast('Не удалось обновить. Проверьте интернет')}).then(function(){if(manual){b.disabled=false;b.textContent='Обновить'}});
+  }
+  $('syncBtn').addEventListener('click',function(){refreshAll(true)});
+  setInterval(function(){if(!document.hidden)refreshAll(false)},30000);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)refreshAll(false)});
+  window.addEventListener('focus',function(){refreshAll(false)});
+  window.addEventListener('online',function(){refreshAll(false)});
 })();
 </script>
 </body></html>
