@@ -9,6 +9,8 @@
  *  • преподаватель может сменить код на свой (кабинет → «Сменить код»)
  *  • преподаватель видит и меняет ТОЛЬКО свои занятия и свои заявки
  *  • защита от потока заявок: лимиты, одноразовые токены, защита от подбора кодов
+ *  • (необязательно) капча Cloudflare Turnstile: включается свойством скрипта TURNSTILE_SECRET
+ *  • ежедневный резерв данных внутри самой таблицы (лист «Резерв»), почти не занимает места
  */
 
 // ===================== НАСТРОЙКИ (заполните) =====================
@@ -558,6 +560,21 @@ function dayCount_(inc) {
   return n;
 }
 
+// Проверка ответа капчи на стороне Cloudflare. Если сам Cloudflare недоступен, не блокируем людей (остальная защита работает).
+function verifyTurnstile_(secret, token) {
+  token = String(token || '');
+  if (!token || token.length > 2048) return false;
+  try {
+    const r = UrlFetchApp.fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'post', payload: { secret: secret, response: token }, muteHttpExceptions: true
+    });
+    return JSON.parse(r.getContentText()).success === true;
+  } catch (err) {
+    console.warn('Turnstile недоступен: ' + err);
+    return true;
+  }
+}
+
 function badText_(s) { return /(https?:\/\/|www\.|\bt\.me\/|<\/?[a-z]|\[url)/i.test(s); }
 
 // Приём заявки. legacy = пришла от старой страницы без токена (допускается, но с жёстким лимитом).
@@ -583,6 +600,10 @@ function submitLead_(data, legacy) {
   if (!/[A-Za-zА-Яа-яЁё]/.test(name) || contact.length < 4) return { ok: false, error: 'bad' };
   if (badText_(name) || badText_(comment) || badText_(time)) return { ok: false, error: 'bad' };
   if (/https?:\/\//i.test(contact) && !/(instagram\.com|t\.me|telegram\.me)/i.test(contact)) return { ok: false, error: 'bad' };
+
+  // капча Cloudflare Turnstile (если включена): проверяем до лимитов, чтобы боты не съедали квоту честных заявок
+  const secret = PropertiesService.getScriptProperties().getProperty('TURNSTILE_SECRET');
+  if (secret && (legacy || !verifyTurnstile_(secret, data.ts))) return { ok: false, error: 'captcha' };
 
   // общие лимиты на весь сайт
   if (bump_(bucket_('rl_m', 60), 120) > LIMITS.perMinute) return { ok: false, error: 'busy' };
@@ -801,6 +822,110 @@ function showTelegramChats() {
 function setup() {
   teachersSheet_();
   console.log('Готово. Откройте кабинет основателя и нажмите «Новый код» у каждого преподавателя.');
+}
+
+// ===================== РЕЗЕРВНЫЕ КОПИИ =====================
+// Раз в сутки (ночью) вся база (заявки, занятия, выплаты, преподаватели) сохраняется строкой в скрытом листе «Резерв».
+// Копии по дням недели перезаписываются по кругу, всего их 7, поэтому место не растёт. Файлы на Диске не создаются.
+// Дополнительно в Google Таблицах есть «Файл → История версий»: оттуда тоже можно вернуть любое прошлое состояние.
+const B_SHEET = 'Резерв';
+const B_CHUNK = 40000; // в одной ячейке Google хранит до 50 000 символов
+
+function backupSheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet() || createSpreadsheet_();
+  let sh = ss.getSheetByName(B_SHEET);
+  if (!sh) {
+    sh = ss.insertSheet(B_SHEET);
+    sh.appendRow(['ключ', 'когда', 'частей', 'данные →']);
+    sh.setFrozenRows(1);
+    try { sh.hideSheet(); } catch (e) {}
+  }
+  return sh;
+}
+
+function dataSheets_() {
+  return [
+    { name: SHEET_NAME, cols: HEADERS.length, get: sheet_ },
+    { name: L_SHEET, cols: L_HEADERS.length, get: lessonsSheet_ },
+    { name: P_SHEET, cols: P_HEADERS.length, get: paymentsSheet_ },
+    { name: T_SHEET, cols: T_HEADERS.length, get: teachersSheet_ }
+  ];
+}
+
+function saveSnapshot_(key) {
+  const snap = { v: SCRIPT_VERSION, at: new Date().toISOString(), sheets: {} };
+  dataSheets_().forEach(function (d) {
+    const sh = d.get();
+    snap.sheets[d.name] = sh.getLastRow() ? sh.getRange(1, 1, sh.getLastRow(), d.cols).getDisplayValues() : [];
+  });
+  const json = JSON.stringify(snap), parts = [];
+  for (let i = 0; i < json.length; i += B_CHUNK) parts.push(json.slice(i, i + B_CHUNK));
+  const sh = backupSheet_();
+  if (sh.getLastRow() > 1) { // убираем прежнюю копию с тем же ключом
+    const ks = sh.getRange(2, 1, sh.getLastRow() - 1, 1).getValues();
+    for (let i = ks.length - 1; i >= 0; i--) if (String(ks[i][0]) === String(key)) sh.deleteRow(i + 2);
+  }
+  const row = [String(key), snap.at, String(parts.length)].concat(parts);
+  if (sh.getMaxColumns() < row.length) sh.insertColumnsAfter(sh.getMaxColumns(), row.length - sh.getMaxColumns());
+  const rng = sh.getRange(sh.getLastRow() + 1, 1, 1, row.length);
+  rng.setNumberFormat('@');
+  rng.setValues([row]);
+  return { parts: parts.length, chars: json.length };
+}
+
+// Запускается автоматически каждую ночь (триггер создаёт setupBackup)
+function dailyBackup() {
+  const day = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'u'); // 1 = понедельник … 7 = воскресенье
+  const r = saveSnapshot_(day);
+  console.log('Резерв сохранён: день ' + day + ', ' + r.chars + ' символов');
+}
+
+// Запустите ОДИН РАЗ вручную: создаёт ночной триггер (около 3:00) и сразу делает первую копию
+function setupBackup() {
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction() === 'dailyBackup') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('dailyBackup').timeBased().everyDays(1).atHour(3).create();
+  dailyBackup();
+}
+
+// Какие копии есть
+function listBackups() {
+  const sh = backupSheet_();
+  if (sh.getLastRow() < 2) { console.log('Копий пока нет'); return; }
+  sh.getRange(2, 1, sh.getLastRow() - 1, 3).getValues().forEach(function (r) {
+    console.log('день ' + r[0] + ' — ' + r[1] + ' (частей: ' + r[2] + ')');
+  });
+}
+
+// Вернуть данные из копии. Какую: свойство скрипта RESTORE_DAY (1–7); если не задано, берётся самая свежая.
+// Перед возвратом текущее состояние само сохраняется под ключом «pre», так что откатить откат можно (RESTORE_DAY = pre).
+function restoreBackup() {
+  const want = PropertiesService.getScriptProperties().getProperty('RESTORE_DAY');
+  const sh = backupSheet_();
+  if (sh.getLastRow() < 2) { console.log('Копий пока нет'); return; }
+  const rows = sh.getRange(2, 1, sh.getLastRow() - 1, sh.getMaxColumns()).getValues();
+  let pick = null;
+  rows.forEach(function (r) {
+    if (want ? String(r[0]) === String(want) : (String(r[0]) !== 'pre' && (!pick || String(r[1]) > String(pick[1])))) pick = r;
+  });
+  if (!pick) { console.log('Копия не найдена'); return; }
+  const n = Number(pick[2]);
+  const snap = JSON.parse(pick.slice(3, 3 + n).join(''));
+  saveSnapshot_('pre');
+  dataSheets_().forEach(function (d) {
+    const vals = snap.sheets[d.name];
+    if (!vals) return;
+    const sh2 = d.get();
+    sh2.clearContents();
+    if (vals.length) {
+      const rng = sh2.getRange(1, 1, vals.length, d.cols);
+      rng.setNumberFormat('@');
+      rng.setValues(vals);
+    }
+  });
+  dropTeacherCache_();
+  console.log('Восстановлено из копии от ' + snap.at);
 }
 
 // ---- Проверка: запустите вручную, чтобы создать тестовую заявку и получить уведомление ----
